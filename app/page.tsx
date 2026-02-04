@@ -1,65 +1,68 @@
-import Image from "next/image";
+import { SignInButton } from "@clerk/nextjs"
+import { SignUpButton } from "@clerk/nextjs"
+import { ChevronRight } from "lucide-react"
+import { DoorOpen, ArrowRight } from "lucide-react"
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+
+export default async function LandingPage() {
+  const { userId } = await auth();
+
+  if (userId) {
+    redirect("/booking");
+  }
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+
+    <div className="min-h-screen bg-white text-zinc-900 selection:bg-orange-100">
+      {/* Subtle Grid Background - Calendar Vibes */}
+      <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
+        style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+      />
+
+      <nav className="relative z-10 flex items-center justify-between px-6 py-6 max-w-5xl mx-auto">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <DoorOpen className="w-8 h-8 text-orange-600" strokeWidth={2} />
+          </div> {/* change this*/}
+          <span className="text-lg font-semibold tracking-tight">Open_Room</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="flex gap-6 items-center text-sm font-medium">
+          <SignInButton mode="modal">
+            <button className="text-zinc-500 hover:text-orange-600 transition-colors cursor-pointer">Log in</button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <button className="bg-orange-600 text-white px-4 py-1.5 rounded-md hover:bg-orange-700 transition-colors cursor-pointer">
+              Sign up
+            </button>
+          </SignUpButton>
+        </div>
+      </nav>
+
+      <main className="relative z-10 max-w-5xl mx-auto px-6 pt-32">
+        <div className="max-w-2xl">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
+            Open_ <br />
+            <span className="text-orange-600">Room.</span>
+          </h1>
+          <p className="text-lg text-zinc-500 mb-8 max-w-md leading-relaxed">
+            You can book rooms. That's it.
+          </p>
+
+          <SignInButton mode="modal">
+            <button className="group flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all">
+              Start booking
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </SignInButton>
+        </div>
+
+        <div className="mt-24 pt-8 border-t border-zinc-100 flex gap-12 text-xs font-medium text-zinc-400 uppercase tracking-widest">
+          <div>// 09:00 — 17:00</div>
+          <div>// 5 Active Rooms</div>
+          <div>// 2hr Daily Limit</div>
         </div>
       </main>
     </div>
-  );
+  )
 }
