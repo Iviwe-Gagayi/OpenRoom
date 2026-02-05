@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react"
 import { DoorOpen, ArrowRight } from "lucide-react"
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { Logo } from "../components/Logo"
 
 
 export default async function LandingPage() {
@@ -23,8 +24,8 @@ export default async function LandingPage() {
       <nav className="relative z-10 flex items-center justify-between px-6 py-6 max-w-5xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
-            <DoorOpen className="w-8 h-8 text-orange-600" strokeWidth={2} />
-          </div> {/* change this*/}
+            <Logo className="w-12 h-12 text-orange-600" />
+          </div>
           <span className="text-lg font-semibold tracking-tight">Open_Room</span>
         </div>
         <div className="flex gap-6 items-center text-sm font-medium">

@@ -1,11 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-// 1. Define which routes are "Private"
+
 const isProtectedRoute = createRouteMatcher(['/booking(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
-    // 2. If the user is trying to access a protected route, 
-    // ensure they are authenticated.
+
     if (isProtectedRoute(req)) await auth.protect();
 });
 
