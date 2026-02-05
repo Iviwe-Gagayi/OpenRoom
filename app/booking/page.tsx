@@ -56,7 +56,7 @@ export default function BookingPage() {
         load();
 
 
-        const interval = setInterval(load, 1000);
+        const interval = setInterval(load, 3000);
 
         return () => clearInterval(interval);
     }, []);
@@ -80,7 +80,9 @@ export default function BookingPage() {
     return (
         <div className="min-h-screen bg-white text-zinc-900 font-sans">
             <nav className="flex items-center justify-between px-8 py-4 border-b border-zinc-100">
-                <div className="flex items-center gap-2">
+                <div
+                    onClick={() => window.location.reload()}
+                    className="flex items-center gap-2 cursor-pointer">
                     <Logo className="w-6 h-6 text-orange-600" />
                     <span className="font-bold tracking-tighter text-sm uppercase">open_room</span>
                 </div>
