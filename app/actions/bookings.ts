@@ -9,21 +9,20 @@ export async function createBooking(roomId: string, slotTime: string) {
 
     if (!userId || !clerkUser) throw new Error("Unauthorized");
 
-    // Extract the date from the slotTime (e.g., "2026-02-05")
+    // Extracting the date from the slotTime 
     const datePart = slotTime.split('-').slice(0, 3).join('-');
     const fullName = `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() || "Anonymous User";
 
     try {
         const result = await prisma.$transaction(async (tx) => {
-            // 1. Sync User
+            // Sync Clerk data with Neon DB
             await tx.user.upsert({
                 where: { id: userId },
                 update: { name: fullName },
                 create: { id: userId, name: fullName },
             });
 
-            // 2. ENFORCE 2-HOUR LIMIT
-            // Count how many bookings this user has for today
+            //2 hour limit check
             const dailyCount = await tx.booking.count({
                 where: {
                     userId: userId,
@@ -35,13 +34,13 @@ export async function createBooking(roomId: string, slotTime: string) {
                 throw new Error("You have reached the 2-hour daily limit.");
             }
 
-            // 3. Check if slot is already taken
+
             const existing = await tx.booking.findFirst({
                 where: { roomId, slotTime },
             });
             if (existing) throw new Error("Room already booked.");
 
-            // 4. Create Booking
+
             return await tx.booking.create({
                 data: { roomId, slotTime, userId },
             });
@@ -70,7 +69,7 @@ export async function cancelBooking(bookingId: string) {
         await prisma.booking.delete({
             where: {
                 id: bookingId,
-                userId: userId // Only the owner can delete
+                userId: userId
             },
         });
 

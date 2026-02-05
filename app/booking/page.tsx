@@ -5,6 +5,7 @@ import { Logo } from "@/components/Logo";
 import { createBooking, getBookings, cancelBooking } from "@/app/actions/bookings";
 
 
+{/* Lazy so Imma just hardcode these for now*/ }
 const rooms = [
     { id: "R01", name: "Room 1" },
     { id: "R02", name: "Room 2" },
@@ -19,7 +20,7 @@ export default function BookingPage() {
 
     const handleSlotClick = async (roomId: string, time: string, bookingId?: string, isMine?: boolean) => {
         if (isMine && bookingId) {
-            // 1. If it's mine, cancel it
+            // If it's user's, cancel it
             const result = await cancelBooking(bookingId);
             if (result.success) {
                 const data = await getBookings();
@@ -28,7 +29,7 @@ export default function BookingPage() {
                 alert(result.error);
             }
         } else {
-            // 2. If it's empty, book it
+            //If empty, book 
             const date = new Date().toISOString().split('T')[0];
             const slotTime = `${date}-${time}`;
             const result = await createBooking(roomId, slotTime);
@@ -45,13 +46,19 @@ export default function BookingPage() {
     const { userId } = useAuth();
     const [bookings, setBookings] = useState<any[]>([]);
 
-    // 1. Fetch current bookings on mount
+    // Fetch current bookings on mount
     useEffect(() => {
         const load = async () => {
             const data = await getBookings();
             setBookings(data);
         };
+
         load();
+
+
+        const interval = setInterval(load, 1000);
+
+        return () => clearInterval(interval);
     }, []);
 
 
@@ -97,7 +104,7 @@ export default function BookingPage() {
                             </div>
                         ))}
 
-                        {/* Grid Rows */}
+                        {/* Grid */}
                         {rooms.map((room) => (
                             <Fragment key={room.id}>
                                 <div className="border-b border-r border-zinc-100 p-6 flex items-center font-bold text-xs uppercase tracking-tight text-zinc-600 bg-white">
@@ -114,12 +121,12 @@ export default function BookingPage() {
                                     return (
                                         <div key={`${room.id}-${time}`} className="border-b border-r border-zinc-100 p-2 group">
                                             <button
-                                                disabled={isTaken} // Allow clicking your own to potentially cancel later
+                                                disabled={isTaken}
                                                 onClick={() => handleSlotClick(room.id, time, booking?.id, isMine)}
                                                 className={`w-full h-16 rounded border transition-all duration-200 flex items-center justify-center ${isMine
                                                     ? "bg-emerald-500 border-emerald-600 shadow-inner cursor-pointer"
                                                     : isTaken
-                                                        ? "bg-rose-500 border-rose-600 opacity-40 cursor-not-allowed"
+                                                        ? "bg-red-600 border-red-600 opacity-80 cursor-not-allowed"
                                                         : "border-dashed border-zinc-200 hover:border-orange-400 hover:bg-orange-50/50 cursor-pointer"
                                                     }`}
                                             >

@@ -16,7 +16,7 @@ export default async function LandingPage() {
   return (
 
     <div className="min-h-screen bg-white text-zinc-900 selection:bg-orange-100">
-      {/* Subtle Grid Background - Calendar Vibes */}
+
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
         style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }}
       />

@@ -6,7 +6,7 @@ export const Logo = ({ className = "w-8 h-8" }: LogoProps) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
-        fill="currentColor" // This allows the 'text-' utility to control the overall fill
+        fill="currentColor"
         className={className}
         style={{ opacity: 1 }}
     >
