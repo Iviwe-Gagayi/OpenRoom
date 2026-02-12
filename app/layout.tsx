@@ -45,7 +45,7 @@ export default function RootLayout({
         },
       }}
     >
-      {/* your html and body tags */}
+
 
       <html lang="en">
         <body
