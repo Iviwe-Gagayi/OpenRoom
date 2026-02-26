@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { createOrganization } from "@/app/actions/organization"; //TODO: create this action
+import { createOrganisation } from "@/app/actions/organisation";
 
 export default async function Bookings() {
 
@@ -48,12 +48,12 @@ export default async function Bookings() {
                     </div>
                 ) : (
                     //If a User doesn't belong to an organization:
-                    <div className="max-w-md mx-auto mt-20 p-8 border border-zinc-200 bg-white shadow-sm">
+                    <div className="max-w-md mx-auto mt-20 p-8 border border-zinc-200 bg-white">
                         <h1 className="text-2xl font-bold tracking-tighter mb-2">Welcome to Open_Room</h1>
                         <p className="text-zinc-600 mb-6">You aren't part of any organizations yet. </p>
-                        <p>Ask your admin to add you your organisatio or create your own to get started. </p>
+                        <p className="text-zinc-600 mb-6">Ask your admin to add you to your organisation or create your own to get started. </p>
 
-                        <form action={createOrganization} className="flex flex-col gap-4">
+                        <form action={createOrganisation} className="flex flex-col gap-4">
                             <input
                                 type="text"
                                 name="orgName"
@@ -63,7 +63,7 @@ export default async function Bookings() {
                             />
                             <button
                                 type="submit"
-                                className="bg-orange-600 text-white font-bold py-2 px-4 hover:bg-orange-700 transition-colors"
+                                className="cursor-pointer bg-orange-600 text-white font-bold py-2 px-4 hover:bg-orange-700 transition-colors"
                             >
                                 Create Organization
                             </button>
