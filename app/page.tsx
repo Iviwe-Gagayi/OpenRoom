@@ -47,21 +47,19 @@ export default async function LandingPage() {
             <span className="text-orange-600">Room.</span>
           </h1>
           <p className="text-lg text-zinc-500 mb-8 max-w-md leading-relaxed">
-            You can book rooms. That's it.
+            You can create and book rooms. That's it.
           </p>
 
           <SignInButton mode="modal">
-            <button className="group flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all">
-              Start booking
+            <button className="cursor-pointer group flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all">
+              Manage Bookings
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </SignInButton>
         </div>
 
         <div className="mt-24 pt-8 border-t border-zinc-100 flex gap-12 text-xs font-medium text-zinc-400 uppercase tracking-widest">
-          <div>// 09:00 — 17:00</div>
-          <div>// 5 Active Rooms</div>
-          <div>// 2hr Daily Limit</div>
+          <div>// By: Iviwe</div>
         </div>
       </main>
     </div>
