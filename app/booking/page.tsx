@@ -1,151 +1,76 @@
-"use client"
-import React, { Fragment, useEffect, useState } from "react";
-import { useAuth, UserButton } from "@clerk/nextjs";
-import { Logo } from "@/components/Logo";
-import { createBooking, getBookings, cancelBooking } from "@/app/actions/bookings";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { createOrganization } from "@/app/actions/organization"; //TODO: create this action
 
+export default async function Bookings() {
 
-{/* Lazy so Imma just hardcode these for now*/ }
-const rooms = [
-    { id: "R01", name: "Room 1" },
-    { id: "R02", name: "Room 2" },
-    { id: "R03", name: "Room 3" },
-    { id: "R04", name: "Room 4" },
-    { id: "R05", name: "Room 5" },
-];
-const slots = ["09:00 - 10:00", "10:00 - 11:00", "11:00 - 12:00", "12:00 - 13:00", "13:00 - 14:00", "14:00 - 15:00", "15:00 - 16:00", "16:00 - 17:00"];
+    const { userId } = await auth();
 
-export default function BookingPage() {
+    if (!userId) {
+        redirect("/LandingPage");
+    }
 
+    const membership = await prisma.orgMember.findMany({
+        where: { userId },
+        include: { organization: true }
+    });
 
-    const handleSlotClick = async (roomId: string, time: string, bookingId?: string, isMine?: boolean) => {
-        if (isMine && bookingId) {
-            // If it's user's, cancel it
-            const result = await cancelBooking(bookingId);
-            if (result.success) {
-                const data = await getBookings();
-                setBookings(data);
-            } else {
-                alert(result.error);
-            }
-        } else {
-            //If empty, book 
-            const date = new Date().toISOString().split('T')[0];
-            const slotTime = `${date}-${time}`;
-            const result = await createBooking(roomId, slotTime);
-
-            if (result.success) {
-                const data = await getBookings();
-                setBookings(data);
-            } else {
-                alert(result.error);
-            }
-        }
-    };
-
-    const { userId } = useAuth();
-    const [bookings, setBookings] = useState<any[]>([]);
-
-    // Fetch current bookings on mount
-    useEffect(() => {
-        const load = async () => {
-            const data = await getBookings();
-            setBookings(data);
-        };
-
-        load();
-
-
-        const interval = setInterval(load, 3000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-
-    const handleBooking = async (roomId: string, time: string) => {
-        const date = new Date().toISOString().split('T')[0];
-        const slotTime = `${date}-${time}`;
-
-        const result = await createBooking(roomId, slotTime);
-
-        if (result.success) {
-            // Re-fetch to update colors
-            const data = await getBookings();
-            setBookings(data);
-        } else {
-            alert(result.error);
-        }
-    };
+    const hasOrganizations = membership.length > 0;
 
     return (
-        <div className="min-h-screen bg-white text-zinc-900 font-sans">
-            <nav className="flex items-center justify-between px-8 py-4 border-b border-zinc-100">
-                <div
-                    onClick={() => window.location.reload()}
-                    className="flex items-center gap-2 cursor-pointer">
-                    <Logo className="w-6 h-6 text-orange-600" />
-                    <span className="font-bold tracking-tighter text-sm uppercase">open_room</span>
-                </div>
-                <UserButton afterSignOutUrl="/" />
-            </nav>
 
-            <main className="p-8 max-w-[1400px] mx-auto">
-                <header className="mb-8">
-                    <h1 className="text-3xl font-black tracking-tighter uppercase">Bookings_</h1>
-                </header>
+        <div className="min-h-screen bg-white text-zinc-900 selection:bg-orange-100">
 
-                <div className="overflow-x-auto border border-zinc-100 rounded-lg shadow-sm">
-                    <div className="grid grid-cols-[150px_repeat(8,1fr)] min-w-[1000px]">
-                        {/* Header */}
-                        <div className="bg-zinc-50 border-b border-r border-zinc-100 p-4 font-mono text-[10px] text-zinc-400 uppercase tracking-widest">
-                            Rooms ↓
+            <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
+                style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+            />
+
+            <main className="relative z-10 max-w-5xl mx-auto px-6 pt-32">
+
+                {hasOrganizations ? (
+                    // If a User belongs to organization:
+                    <div className="space-y-6">
+                        <h1 className="text-3xl font-bold tracking-tighter">Your Organizations</h1>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {membership.map((membership) => (
+                                <Link
+                                    key={membership.organization.id}
+                                    href={`/organization/${membership.organization.id}`}
+                                    className="block p-6 border border-zinc-200 hover:border-orange-500 transition-colors bg-white shadow-sm"
+                                >
+                                    <h2 className="font-bold text-lg">{membership.organization.name}</h2>
+                                    <p className="text-sm text-zinc-500 mt-2">Role: {membership.role}</p>
+                                </Link>
+                            ))}
                         </div>
-                        {slots.map((time) => (
-                            <div key={time} className="bg-zinc-50 border-b border-r border-zinc-100 p-4 text-center font-mono text-[12px] text-zinc-800 font-bold">
-                                {time}
-                            </div>
-                        ))}
-
-                        {/* Grid */}
-                        {rooms.map((room) => (
-                            <Fragment key={room.id}>
-                                <div className="border-b border-r border-zinc-100 p-6 flex items-center font-bold text-xs uppercase tracking-tight text-zinc-600 bg-white">
-                                    {room.name}
-                                </div>
-                                {slots.map((time) => {
-                                    const date = new Date().toISOString().split('T')[0];
-                                    const slotId = `${date}-${time}`;
-                                    const booking = bookings.find(b => b.roomId === room.id && b.slotTime === slotId);
-
-                                    const isMine = booking?.userId === userId;
-                                    const isTaken = !!booking && !isMine;
-
-                                    return (
-                                        <div key={`${room.id}-${time}`} className="border-b border-r border-zinc-100 p-2 group">
-                                            <button
-                                                disabled={isTaken}
-                                                onClick={() => handleSlotClick(room.id, time, booking?.id, isMine)}
-                                                className={`w-full h-16 rounded border transition-all duration-200 flex items-center justify-center ${isMine
-                                                    ? "bg-emerald-500 border-emerald-600 shadow-inner cursor-pointer"
-                                                    : isTaken
-                                                        ? "bg-red-600 border-red-600 opacity-80 cursor-not-allowed"
-                                                        : "border-dashed border-zinc-200 hover:border-orange-400 hover:bg-orange-50/50 cursor-pointer"
-                                                    }`}
-                                            >
-                                                {(isMine || isTaken) && (
-                                                    <span className="text-[10px] font-bold text-white uppercase tracking-tighter">
-                                                        {isMine ? "You" : "Booked"}
-                                                    </span>
-                                                )}
-                                            </button>
-                                        </div>
-                                    );
-                                })}
-                            </Fragment>
-                        ))}
                     </div>
-                </div>
+                ) : (
+                    //If a User doesn't belong to an organization:
+                    <div className="max-w-md mx-auto mt-20 p-8 border border-zinc-200 bg-white shadow-sm">
+                        <h1 className="text-2xl font-bold tracking-tighter mb-2">Welcome to Open_Room</h1>
+                        <p className="text-zinc-600 mb-6">You aren't part of any organizations yet. </p>
+                        <p>Ask your admin to add you your organisatio or create your own to get started. </p>
+
+                        <form action={createOrganization} className="flex flex-col gap-4">
+                            <input
+                                type="text"
+                                name="orgName"
+                                placeholder="Organization Name (e.g., Company XYZ)"
+                                required
+                                className="px-4 py-2 border border-zinc-300 focus:outline-none focus:border-orange-500"
+                            />
+                            <button
+                                type="submit"
+                                className="bg-orange-600 text-white font-bold py-2 px-4 hover:bg-orange-700 transition-colors"
+                            >
+                                Create Organization
+                            </button>
+                        </form>
+                    </div>
+                )}
             </main>
         </div>
-    );
+    )
 }
