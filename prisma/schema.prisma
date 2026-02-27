@@ -43,7 +43,7 @@ model Location {
   maxHoursPerUser     Int?         //null means unlimited
   
   parentId       String?
-  parent         Location?    @relation("LocationHierarchy", fields: [parentId], references: [id])
+  parent         Location?    @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children       Location[]   @relation("LocationHierarchy")
   
   bookings       Booking[]
@@ -62,7 +62,7 @@ model Booking {
   userId   String
   user     User   @relation(fields: [userId], references: [id])
   locationId String
-  location   Location @relation(fields: [locationId], references: [id])
+  location       Location     @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@unique([locationId, slotTime])
 }
