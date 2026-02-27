@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import AddLocationButton from "./AddLocationButton";
 
 export default async function OrganizationPage({
     params
@@ -63,9 +64,7 @@ export default async function OrganizationPage({
                     <div className="p-8 border !border-dashed !border-red-300 text-center">
                         <p className="text-zinc-500">No root locations found.</p>
                         {membership.role === "ADMIN" && (
-                            <p className="text-sm text-orange-600 mt-2 font-medium cursor-pointer">
-                                + Add your first Building or Room
-                            </p>
+                            <AddLocationButton organisationId={organizationId} parentId={null} />
                         )}
                     </div>
                 )}
