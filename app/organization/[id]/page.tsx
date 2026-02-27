@@ -29,13 +29,16 @@ export default async function OrganizationPage({
     if (!membership) redirect("/bookings");
 
     // Fetch the Locations with no parent
-    const rootLocations = await prisma.location.findMany({
+    const rawLocations = await prisma.location.findMany({
         where: {
             organizationId: organizationId,
             parentId: null
         },
-        orderBy: { name: 'asc' }
     });
+
+    const rootLocations = rawLocations.sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    );
 
     return (
         <div className="min-h-screen bg-white text-zinc-900">
@@ -48,7 +51,7 @@ export default async function OrganizationPage({
 
                 {rootLocations.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <p className="text-zinc-500">Select a location to drill down.</p>
+                        <p className="text-zinc-500">Select a location to book.</p>
                         {rootLocations.map((location) => (
                             <Link
                                 key={location.id}
@@ -62,7 +65,7 @@ export default async function OrganizationPage({
                     </div>
                 ) : (
                     <div className="p-8 border !border-dashed !border-red-300 text-center">
-                        <p className="text-zinc-500">No root locations found.</p>
+                        <p className="text-zinc-500 p-4">No root locations found.</p>
                         {membership.role === "ADMIN" && (
                             <AddLocationButton organisationId={organizationId} parentId={null} />
                         )}

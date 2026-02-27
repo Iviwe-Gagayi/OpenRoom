@@ -55,7 +55,7 @@ export default function BulkCreateModal({ organisationId, parentId, onClose }: B
                     <h2 className="text-xl font-bold tracking-tighter">
                         {step === 1 ? "Create Locations" : "Review & Edit"}
                     </h2>
-                    <button onClick={onClose} className="text-zinc-400 hover:text-zinc-900">&times;</button>
+                    <button onClick={onClose} className="cursor-pointer text-zinc-400 hover:text-zinc-900">&times;</button>
                 </div>
 
                 {step === 1 ? (
@@ -99,7 +99,7 @@ export default function BulkCreateModal({ organisationId, parentId, onClose }: B
                         <button
                             onClick={handleGenerate}
                             disabled={!prefix.trim() && quantity === 1}
-                            className="w-full bg-zinc-900 text-white font-bold py-2 mt-4 disabled:opacity-50"
+                            className=" cursor-pointer w-full bg-zinc-900 text-white font-bold py-2 mt-4 disabled:opacity-50"
                         >
                             Generate Preview
                         </button>
@@ -120,14 +120,14 @@ export default function BulkCreateModal({ organisationId, parentId, onClose }: B
                         <div className="flex gap-2 mt-4">
                             <button
                                 onClick={() => setStep(1)}
-                                className="flex-1 border border-zinc-300 font-bold py-2 hover:bg-zinc-50"
+                                className="cursor-pointer flex-1 border border-zinc-300 font-bold py-2 hover:bg-zinc-50"
                             >
                                 Back
                             </button>
                             <button
                                 onClick={handleSubmit}
                                 disabled={isPending}
-                                className="flex-1 bg-orange-600 text-white font-bold py-2 hover:bg-orange-700 disabled:opacity-50"
+                                className="cursor-pointer flex-1 bg-orange-600 text-white font-bold py-2 hover:bg-orange-700 disabled:opacity-50"
                             >
                                 {isPending ? "Saving..." : "Save to Database"}
                             </button>
