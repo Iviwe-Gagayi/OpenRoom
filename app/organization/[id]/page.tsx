@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import AddLocationButton from "./AddLocationButton";
+import DeleteLocationButton from "./DeleteLocationButton";
 
 export default async function OrganizationPage({
     params
@@ -47,21 +48,41 @@ export default async function OrganizationPage({
                     <h1 className="text-3xl font-bold tracking-tighter">
                         {membership.organization.name}
                     </h1>
+                    <p className="text-zinc-500">Select a location to book.</p>
                 </div>
 
                 {rootLocations.length > 0 ? (
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <p className="text-zinc-500">Select a location to book.</p>
+
+
+                        {membership.role === "ADMIN" && (
+                            <div className="flex border-2 border-dashed border-zinc-300 hover:border-orange-500 transition-colors min-h-[120px]">
+                                <div className="m-auto">
+                                    <AddLocationButton organisationId={organizationId} parentId={null} />
+                                </div>
+                            </div>
+                        )}
+
                         {rootLocations.map((location) => (
                             <Link
                                 key={location.id}
                                 href={`/organization/${organizationId}/location/${location.id}`}
-                                className="block p-6 border border-zinc-200 hover:border-orange-500 transition-colors shadow-sm"
+                                className="relative block p-6 border border-zinc-200 hover:border-orange-500 transition-colors shadow-sm bg-white group"
                             >
-                                <h2 className="font-bold text-lg">{location.name}</h2>
+                                <h2 className="font-bold text-lg pr-8">{location.name}</h2>
                                 <p className="text-xs font-mono text-zinc-400 mt-2 uppercase">{location.type}</p>
+
+                                {membership.role === "ADMIN" && (
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <DeleteLocationButton locationId={location.id} organisationId={organizationId} />
+                                    </div>
+                                )}
                             </Link>
                         ))}
+
+
+
                     </div>
                 ) : (
                     <div className="p-8 border !border-dashed !border-red-300 text-center">

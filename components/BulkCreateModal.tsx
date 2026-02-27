@@ -14,7 +14,7 @@ export default function BulkCreateModal({ organisationId, parentId, onClose }: B
     const [isPending, startTransition] = useTransition();
 
     // State
-    const [type, setType] = useState("Building");
+    const [type, setType] = useState("BUILDING");
     const [prefix, setPrefix] = useState("");
     const [quantity, setQuantity] = useState(1);
 
