@@ -1,0 +1,75 @@
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+
+export default async function OrganizationPage({
+    params
+}: {
+    params: Promise<{ id: string }>
+}) {
+    const { userId } = await auth();
+    if (!userId) redirect("/LandingPage");
+
+    // Await the params in Next.js 15
+    const { id: organizationId } = await params;
+
+
+    const membership = await prisma.orgMember.findUnique({
+        where: {
+            userId_organizationId: {
+                userId: userId,
+                organizationId: organizationId
+            }
+        },
+        include: { organization: true }
+    });
+
+    if (!membership) redirect("/bookings");
+
+    // Fetch the Locations with no parent
+    const rootLocations = await prisma.location.findMany({
+        where: {
+            organizationId: organizationId,
+            parentId: null
+        },
+        orderBy: { name: 'asc' }
+    });
+
+    return (
+        <div className="min-h-screen bg-white text-zinc-900">
+            <main className="max-w-5xl mx-auto px-6 pt-32">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold tracking-tighter">
+                        {membership.organization.name}
+                    </h1>
+                </div>
+
+                {rootLocations.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <p className="text-zinc-500">Select a location to drill down.</p>
+                        {rootLocations.map((location) => (
+                            <Link
+                                key={location.id}
+                                href={`/organization/${organizationId}/location/${location.id}`}
+                                className="block p-6 border border-zinc-200 hover:border-orange-500 transition-colors shadow-sm"
+                            >
+                                <h2 className="font-bold text-lg">{location.name}</h2>
+                                <p className="text-xs font-mono text-zinc-400 mt-2 uppercase">{location.type}</p>
+                            </Link>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="p-8 border !border-dashed !border-red-300 text-center">
+                        <p className="text-zinc-500">No root locations found.</p>
+                        {membership.role === "ADMIN" && (
+                            <p className="text-sm text-orange-600 mt-2 font-medium cursor-pointer">
+                                + Add your first Building or Room
+                            </p>
+                        )}
+                    </div>
+                )}
+            </main>
+        </div>
+    );
+}
