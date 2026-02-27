@@ -43,6 +43,9 @@ export default async function OrganizationPage({
 
     return (
         <div className="min-h-screen bg-white text-zinc-900">
+            <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
+                style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+            />
             <main className="max-w-5xl mx-auto px-6 pt-32">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold tracking-tighter">
@@ -68,7 +71,7 @@ export default async function OrganizationPage({
                             <Link
                                 key={location.id}
                                 href={`/organization/${organizationId}/location/${location.id}`}
-                                className="relative block p-6 border border-zinc-200 hover:border-orange-500 transition-colors shadow-sm bg-white group"
+                                className="z-10 block p-6 border border-zinc-200 hover:border-orange-500 transition-colors shadow-sm bg-white group"
                             >
                                 <h2 className="font-bold text-lg pr-8">{location.name}</h2>
                                 <p className="text-xs font-mono text-zinc-400 mt-2 uppercase">{location.type}</p>
