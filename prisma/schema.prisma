@@ -38,6 +38,9 @@ model Location {
   
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
+
+  slotDurationMinutes Int          @default(60) // e.g., 15, 30, 60
+  maxHoursPerUser     Int?         //null means unlimited
   
   parentId       String?
   parent         Location?    @relation("LocationHierarchy", fields: [parentId], references: [id])
