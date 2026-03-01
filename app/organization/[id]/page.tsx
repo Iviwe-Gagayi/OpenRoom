@@ -1,10 +1,11 @@
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import AddLocationButton from "./AddLocationButton";
 import DeleteLocationButton from "./DeleteLocationButton";
 import InviteUserForm from "./InviteUserForm";
+import MemberList from "./MemberList";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export default async function OrganizationPage({
     params,
@@ -47,6 +48,43 @@ export default async function OrganizationPage({
     const rootLocations = rawLocations.sort((a, b) =>
         a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
     );
+
+    // Show members if we're in the users view
+    let orgMembers: any[] = [];
+    let enrichedMembers: any[] = [];
+
+    if (currentView === "users") {
+        const rawMembers = await prisma.orgMember.findMany({
+            where: { organizationId: organizationId },
+        });
+
+        const userIds = rawMembers.map(m => m.userId);
+
+        if (userIds.length > 0) {
+            const client = await clerkClient();
+            const clerkUsers = await client.users.getUserList({
+                userId: userIds,
+            });
+
+            enrichedMembers = rawMembers.map(member => {
+                const clerkUser = clerkUsers.data.find(u => u.id === member.userId);
+                const fallbackEmail = clerkUser?.emailAddresses[0]?.emailAddress || "Unknown User";
+                const fullName = clerkUser?.firstName
+                    ? `${clerkUser.firstName} ${clerkUser.lastName || ""}`.trim()
+                    : fallbackEmail;
+
+                return {
+                    userId: member.userId,
+                    role: member.role,
+                    joinedAt: member.createdAt,
+                    name: fullName,
+                    email: fallbackEmail
+                };
+            });
+
+            enrichedMembers.sort((a, b) => a.name.localeCompare(b.name));
+        }
+    }
 
     return (
         <div className="min-h-screen bg-white text-zinc-900">
@@ -129,11 +167,11 @@ export default async function OrganizationPage({
                     /* Users & Invites */
                     <div className="space-y-8">
                         <InviteUserForm organizationId={organizationId} />
-
-                        {/* TODO: Add Data Table for existing members later */}
-                        <div className="p-12 border border-zinc-200 bg-zinc-50 rounded-xl text-center">
-                            <p className="text-zinc-500">Member directory will go here.</p>
-                        </div>
+                        <MemberList
+                            members={enrichedMembers}
+                            organizationId={organizationId}
+                            currentUserId={userId}
+                        />
                     </div>
 
                 )}

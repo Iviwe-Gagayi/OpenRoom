@@ -12,7 +12,7 @@ generator client {
 model Organization {
   id        String      @id @default(cuid())
   name      String
-  
+
   members   OrgMember[]
   locations Location[]  // All spaces owned by this org
   invites     OrgInvite[]
@@ -24,6 +24,7 @@ model OrgMember {
   id             String       @id @default(cuid())
   userId         String       // Your Clerk User ID
   role           String       @default("MEMBER") // "ADMIN" can add locations/users
+  createdAt      DateTime     @default(now())
   
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
