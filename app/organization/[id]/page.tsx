@@ -6,15 +6,20 @@ import AddLocationButton from "./AddLocationButton";
 import DeleteLocationButton from "./DeleteLocationButton";
 
 export default async function OrganizationPage({
-    params
+    params,
+    searchParams
 }: {
     params: Promise<{ id: string }>
+    searchParams: Promise<{ view?: string }>
 }) {
     const { userId } = await auth();
     if (!userId) redirect("/LandingPage");
 
     // Await the params in Next.js 15
     const { id: organizationId } = await params;
+    const { view } = await searchParams;
+
+    const currentView = view === "users" ? "users" : "locations";
 
 
     const membership = await prisma.orgMember.findUnique({

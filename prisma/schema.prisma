@@ -12,8 +12,10 @@ generator client {
 model Organization {
   id        String      @id @default(cuid())
   name      String
+  
   members   OrgMember[]
   locations Location[]  // All spaces owned by this org
+  invites     OrgInvite[]
 }
 
 //this will connect Clerk account/users to organisations
@@ -47,6 +49,18 @@ model Location {
   children       Location[]   @relation("LocationHierarchy")
   
   bookings       Booking[]
+}
+
+//store "whitelisted"/"invited" emails for new users to an org
+model OrgInvite {
+  id             String       @id @default(cuid())
+  email          String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  // can't invite the same email twice to the same org
+  @@unique([email, organizationId]) 
 }
 
 model User {
