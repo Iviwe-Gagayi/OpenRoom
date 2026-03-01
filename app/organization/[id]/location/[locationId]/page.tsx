@@ -87,7 +87,9 @@ export default async function LocationPage({
                         <div className="p-12 border border-zinc-200 bg-white rounded-xl text-center shadow-sm">
                             <h2 className="text-xl font-bold mb-2">Booking Calendar</h2>
                             <p className="text-zinc-500">
-                                This space is bookable! The calendar interface will go here.
+
+
+
                             </p>
                         </div>
                     )
