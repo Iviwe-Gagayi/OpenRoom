@@ -71,13 +71,13 @@ export default async function OrganizationPage({
                             <Link
                                 key={location.id}
                                 href={`/organization/${organizationId}/location/${location.id}`}
-                                className="z-10 block p-6 border border-zinc-200 hover:border-orange-500 transition-colors shadow-sm bg-white group"
+                                className=" relative z-10 block p-6 border border-zinc-200 hover:border-orange-500 transition-colors shadow-sm bg-white group"
                             >
                                 <h2 className="font-bold text-lg pr-8">{location.name}</h2>
                                 <p className="text-xs font-mono text-zinc-400 mt-2 uppercase">{location.type}</p>
 
                                 {membership.role === "ADMIN" && (
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <DeleteLocationButton locationId={location.id} organisationId={organizationId} />
                                     </div>
                                 )}

@@ -104,10 +104,12 @@ export default async function LocationPage({
                                 <p className="text-xs font-mono text-zinc-400 mt-2 uppercase">{child.type}</p>
 
                                 {membership.role === "ADMIN" && (
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <DeleteLocationButton locationId={child.id} organisationId={organizationId} />
                                     </div>
                                 )}
+
+
                             </Link>
                         ))}
 

@@ -24,7 +24,7 @@ export default function DeleteLocationButton({ locationId, organisationId }: { l
         <button
             onClick={handleDelete}
             disabled={isPending}
-            className="cursor-pointer absolute top-4 right-4 text-zinc-400 hover:text-red-600 transition-colors disabled:opacity-50"
+            className="cursor-pointer text-zinc-400 hover:text-red-600 transition-colors disabled:opacity-50"
             title="Delete Location"
         >
             {isPending ? "..." : (
