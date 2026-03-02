@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -10,6 +10,33 @@ export default async function Bookings() {
 
     if (!userId) {
         redirect("/LandingPage");
+    }
+
+    //checking if user is invited + adding them to the org if they are:
+    const user = await currentUser();
+    const email = user?.emailAddresses[0]?.emailAddress;
+
+    if (email) {
+        const pendingInvites = await prisma.orgInvite.findMany({
+            where: { email: email.toLowerCase() }
+        });
+
+        if (pendingInvites.length > 0) {
+            await prisma.orgMember.createMany({
+                data: pendingInvites.map((invite) => ({
+                    userId: userId,
+                    organizationId: invite.organizationId,
+                    role: "USER"
+                })),
+                skipDuplicates: true,
+            });
+
+            await prisma.orgInvite.deleteMany({
+                where: { email: email.toLowerCase() }
+            });
+
+            redirect("/Bookings");
+        }
     }
 
     const membership = await prisma.orgMember.findMany({
