@@ -5,6 +5,7 @@ import Link from "next/link";
 import AddLocationButton from "../../AddLocationButton";
 import DeleteLocationButton from "../../DeleteLocationButton";
 import AdminLeafNodeManager from "./AdminLeafNodeManager";
+import BookingInterface from "./BookingInterface";
 
 export default async function LocationPage({
     params
@@ -26,7 +27,11 @@ export default async function LocationPage({
 
     const currentLocation = await prisma.location.findFirst({
         where: { id: locationId, organizationId: organizationId },
-        include: { parent: true }
+        include: {
+            parent: true,
+            organization: true,
+            children: true
+        }
     });
 
     if (!currentLocation) redirect(`/organization/${organizationId}`);
@@ -77,19 +82,16 @@ export default async function LocationPage({
                 {/* Container has no children */}
                 {isLeafNode ? (
                     isAdmin ? (
-                        <AdminLeafNodeManager
-                            organisationId={organizationId}
-                            locationId={currentLocation.id}
-                            locationName={currentLocation.name}
-                            locationType={currentLocation.type}
-                        />
+                        <AdminLeafNodeManager currentLocation={currentLocation} />
                     ) : (
-                        <div className="p-12 border border-zinc-200 bg-white rounded-xl text-center shadow-sm">
+                        <div className="mb-24 p-12 border border-zinc-200 bg-white rounded-xl text-center shadow-sm">
                             <h2 className="text-xl font-bold mb-2">Booking Calendar</h2>
                             <p className="text-zinc-500">
-
-
-
+                                <BookingInterface
+                                    locationId={currentLocation.id}
+                                    organizationId={currentLocation.organizationId}
+                                    slotDurationMinutes={currentLocation.organization.slotDurationMinutes}
+                                />
                             </p>
                         </div>
                     )

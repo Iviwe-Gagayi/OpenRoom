@@ -2,15 +2,19 @@
 
 import { useState } from "react";
 import AddLocationButton from "../../AddLocationButton";
+import BookingInterface from "./BookingInterface";
+import { Prisma } from "@prisma/client";
+
+type LocationWithOrg = Prisma.LocationGetPayload<{
+    include: { organization: true }
+}>;
+
 
 type AdminLeafNodeProps = {
-    organisationId: string;
-    locationId: string;
-    locationName: string;
-    locationType: string;
+    currentLocation: LocationWithOrg;
 };
 
-export default function AdminLeafNodeManager({ organisationId, locationId, locationName, locationType }: AdminLeafNodeProps) {
+export default function AdminLeafNodeManager({ currentLocation }: AdminLeafNodeProps) {
     const [viewMode, setViewMode] = useState<"admin" | "user">("admin");
 
     return (
@@ -37,21 +41,24 @@ export default function AdminLeafNodeManager({ organisationId, locationId, locat
             {viewMode === "admin" ? (
                 <div className="p-12 border border-dashed border-zinc-300 flex flex-col items-center justify-center bg-zinc-50/50">
                     <p className="text-zinc-500 mb-4 text-center">
-                        This {locationType.toLowerCase()} has no sub-locations.<br />
+                        This {currentLocation.type.toLowerCase()} has no sub-locations.<br />
                         Add containers to partition this space.
                     </p>
-                    <AddLocationButton organisationId={organisationId} parentId={locationId} />
+                    <AddLocationButton
+                        organisationId={currentLocation.organizationId}
+                        parentId={currentLocation.id}
+                    />
                 </div>
             ) : (
-                <div className="p-12 border border-zinc-200 bg-white rounded-xl text-center shadow-sm">
-                    <h2 className="text-xl font-bold mb-2">Booking Calendar</h2>
-                    <p className="text-zinc-500">
+                <div className="mb-24 p-12 border border-zinc-200 bg-white rounded-xl shadow-sm">
+                    <h2 className="text-xl font-bold mb-6 text-center">Booking Calendar</h2>
 
+                    <BookingInterface
+                        locationId={currentLocation.id}
+                        organizationId={currentLocation.organizationId}
+                        slotDurationMinutes={currentLocation.organization.slotDurationMinutes}
+                    />
 
-
-
-                        (Calendar UI goes here for {locationName})
-                    </p>
                 </div>
             )}
         </div>
