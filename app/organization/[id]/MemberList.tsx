@@ -35,7 +35,7 @@ export default function MemberList({
     };
 
     return (
-        <div className="border border-zinc-200 bg-white shadow-sm">
+        <div className="relative z-10 border border-zinc-200 bg-white shadow-sm">
             <div className="p-4 border-b border-zinc-200 bg-zinc-50">
                 <h2 className="font-bold text-zinc-900">Active Members</h2>
             </div>

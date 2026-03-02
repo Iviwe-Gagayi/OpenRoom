@@ -27,7 +27,7 @@ export default function InviteUserForm({ organizationId }: { organizationId: str
     };
 
     return (
-        <div className="p-6 border border-zinc-200 bg-white shadow-sm">
+        <div className="relative z-10 w-full p-6 border border-zinc-200 bg-white shadow-sm">
             <h2 className="text-lg font-bold mb-1">Add New User</h2>
             <p className="text-sm text-zinc-500 mb-6">
                 Add an email address to the whitelist. They will automatically join this organization when they sign up.

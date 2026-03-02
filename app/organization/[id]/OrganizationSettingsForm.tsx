@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateOrganizationSettings } from "@/app/actions/actions";
+import { updateOrganizationSettings } from "@/app/actions/settings";
 
 export default function OrganizationSettingsForm({
     organizationId,
@@ -12,7 +12,6 @@ export default function OrganizationSettingsForm({
     initialSlotDuration: number;
     initialMaxHours: number | null;
 }) {
-    // Initializing state with the current settings
     const [slotDuration, setSlotDuration] = useState(initialSlotDuration);
     const [maxHours, setMaxHours] = useState(initialMaxHours || "");
 
@@ -21,15 +20,29 @@ export default function OrganizationSettingsForm({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Safety Check: If the slot duration changed, confirm with the admin before proceeding
+        if (slotDuration !== initialSlotDuration) {
+            const confirmed = window.confirm(
+                "DANGER: Changing the Time Slot Duration will instantly delete ALL future bookings in this organization to prevent calendar conflicts. Are you absolutely sure?"
+            );
+            if (!confirmed) {
+
+                setSlotDuration(initialSlotDuration);
+                return;
+            }
+        }
+
         setIsPending(true);
         setStatus({ type: null, message: "" });
 
-        // Convertin the string input back to numbers/null
         const parsedMaxHours = maxHours === "" ? null : Number(maxHours);
 
         const result = await updateOrganizationSettings(organizationId, {
             slotDurationMinutes: Number(slotDuration),
-            maxHoursPerUser: parsedMaxHours
+            maxHoursPerUser: parsedMaxHours,
+
+            didIntervalChange: slotDuration !== initialSlotDuration
         });
 
         if (result.error) {
@@ -42,74 +55,74 @@ export default function OrganizationSettingsForm({
     };
 
     return (
-        <div className="relative z-10 w-full p-8 border border-zinc-200 bg-white shadow-sm">
-            <h2 className="text-lg font-bold mb-1">Booking Rules</h2>
-            <p className="text-sm text-zinc-500 mb-6">
-                Define the global calendar grid and usage limits for this organization.
-            </p>
+        <div className="relative z-10 w-full p-8 border border-zinc-200 bg-white shadow-sm mb-12">
+            <div className="max-w-2xl">
+                <h2 className="text-lg font-bold mb-1">Booking Rules</h2>
+                <p className="text-sm text-zinc-500 mb-6">
+                    Define the global calendar grid and usage limits for this organization.
+                </p>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-
-                {/* SLOT DURATION*/}
-                <div>
-                    <label className="block text-sm font-medium text-zinc-900 mb-1">
-                        Time Slot Duration (Minutes)
-                    </label>
-                    <select
-                        value={slotDuration}
-                        onChange={(e) => setSlotDuration(Number(e.target.value))}
-                        className="w-full px-4 py-2 border border-zinc-300 focus:border-orange-500 outline-none bg-white"
-                        disabled={isPending}
-                    >
-                        <option value={15}>15 Minutes</option>
-                        <option value={30}>30 Minutes</option>
-                        <option value={45}>45 Minutes</option>
-                        <option value={60}>60 Minutes (1 Hour)</option>
-                        <option value={120}>120 Minutes (2 Hours)</option>
-                    </select>
-                    <p className="text-xs text-zinc-500 mt-2">
-                        This determines how the calendar grid is drawn for users.
+                <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-md">
+                    <h3 className="text-sm font-bold text-red-800 mb-1">Proceed with caution</h3>
+                    <p className="text-sm text-red-700">
+                        Changing the <strong>Time Slot Duration</strong> after your organization is live will automatically cancel and delete all upcoming user bookings to prevent grid misalignment.
                     </p>
                 </div>
 
-                {/* MAX HOURS */}
-                <div>
-                    <label className="block text-sm font-medium text-zinc-900 mb-1">
-                        Max Booking Hours (Per User / Per Day)
-                    </label>
-                    <input
-                        type="number"
-                        min="1"
-                        step="1"
-                        value={maxHours}
-                        onChange={(e) => setMaxHours(e.target.value)}
-                        placeholder="e.g. 2"
-                        className="w-full px-4 py-2 border border-zinc-300 focus:border-orange-500 outline-none"
-                        disabled={isPending}
-                    />
-                    <p className="text-xs text-zinc-500 mt-2">
-                        Leave blank for unlimited booking time.
-                    </p>
-                </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
 
-
-                <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
                     <div>
-                        {status.message && (
-                            <p className={`text-sm font-medium ${status.type === "error" ? "text-red-600" : "text-green-600"}`}>
-                                {status.message}
-                            </p>
-                        )}
+                        <label className="block text-sm font-medium text-zinc-900 mb-1">
+                            Time Slot Duration (Minutes)
+                        </label>
+                        <select
+                            value={slotDuration}
+                            onChange={(e) => setSlotDuration(Number(e.target.value))}
+                            className="w-full px-4 py-2 border border-zinc-300 focus:border-orange-500 outline-none bg-white"
+                            disabled={isPending}
+                        >
+                            <option value={15}>15 Minutes</option>
+                            <option value={30}>30 Minutes</option>
+                            <option value={45}>45 Minutes</option>
+                            <option value={60}>60 Minutes (1 Hour)</option>
+                            <option value={120}>120 Minutes (2 Hours)</option>
+                        </select>
                     </div>
-                    <button
-                        type="submit"
-                        disabled={isPending}
-                        className="cursor-pointer px-6 py-2 bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        {isPending ? "Saving..." : "Save Settings"}
-                    </button>
-                </div>
-            </form>
+
+                    <div>
+                        <label className="block text-sm font-medium text-zinc-900 mb-1">
+                            Max Booking Hours (Per User / Per Day)
+                        </label>
+                        <input
+                            type="number"
+                            min="1"
+                            step="1"
+                            value={maxHours}
+                            onChange={(e) => setMaxHours(e.target.value)}
+                            placeholder="e.g. 2"
+                            className="w-full px-4 py-2 border border-zinc-300 focus:border-orange-500 outline-none"
+                            disabled={isPending}
+                        />
+                    </div>
+
+                    <div className="pt-6 mt-6 border-t border-zinc-100 flex items-center justify-between">
+                        <div>
+                            {status.message && (
+                                <p className={`text-sm font-medium ${status.type === "error" ? "text-red-600" : "text-green-600"}`}>
+                                    {status.message}
+                                </p>
+                            )}
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={isPending}
+                            className="cursor-pointer px-6 py-2 bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            {isPending ? "Saving..." : "Save Settings"}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

@@ -1,69 +1,112 @@
 "use server"
+
 import { prisma } from "@/lib/prisma";
-import { auth, currentUser } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache";
 
-export async function createBooking(roomId: string, slotTime: string) {
+export async function createBooking(
+    locationId: string,
+    organizationId: string,
+    startTimeISO: string,
+    endTimeISO: string
+) {
     const { userId } = await auth();
-    const clerkUser = await currentUser();
+    if (!userId) return { error: "Unauthorized" };
 
-    if (!userId || !clerkUser) throw new Error("Unauthorized");
-
-    // Extracting the date from the slotTime 
-    const datePart = slotTime.split('-').slice(0, 3).join('-');
-    const fullName = `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() || "Anonymous User";
+    const startTime = new Date(startTimeISO);
+    const endTime = new Date(endTimeISO);
 
     try {
-        const result = await prisma.$transaction(async (tx) => {
-            // Sync Clerk data with Neon DB
-            await tx.user.upsert({
-                where: { id: userId },
-                update: { name: fullName },
-                create: { id: userId, name: fullName },
-            });
+        await prisma.$transaction(async (tx) => {
 
-            //2 hour limit check
-            const dailyCount = await tx.booking.count({
+            const org = await tx.organization.findUnique({
+                where: { id: organizationId }
+            });
+            if (!org) throw new Error("Organization not found.");
+
+            //checking for overlapping bookings in the same location
+            const existingBooking = await tx.booking.findFirst({
                 where: {
-                    userId: userId,
-                    slotTime: { startsWith: datePart }
+                    locationId,
+                    startTime: { lt: endTime },
+                    endTime: { gt: startTime }
                 }
             });
 
-            if (dailyCount >= 2) {
-                throw new Error("You have reached the 2-hour daily limit.");
+            if (existingBooking) {
+                throw new Error("This room was just booked by someone else for this time!");
             }
 
 
-            const existing = await tx.booking.findFirst({
-                where: { roomId, slotTime },
-            });
-            if (existing) throw new Error("Room already booked.");
+            //max hours per user check 
+            if (org.maxHoursPerUser !== null) {
+                const startOfDay = new Date(startTime);
+                startOfDay.setHours(0, 0, 0, 0);
+                const endOfDay = new Date(startTime);
+                endOfDay.setHours(23, 59, 59, 999);
 
 
+                const todaysBookings = await tx.booking.findMany({
+                    where: {
+                        userId: userId,
+                        startTime: { gte: startOfDay, lte: endOfDay },
+                        location: { organizationId: organizationId }
+                    }
+                });
+
+
+                const bookedMs = todaysBookings.reduce((total, b) => {
+                    return total + (b.endTime.getTime() - b.startTime.getTime());
+                }, 0);
+                const bookedHours = bookedMs / (1000 * 60 * 60);
+
+
+                const requestedHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+
+                if (bookedHours + requestedHours > org.maxHoursPerUser) {
+                    throw new Error(`This booking exceeds your ${org.maxHoursPerUser}-hour daily limit.`);
+                }
+            }
+
+            //Creating booking if all checks pass
             return await tx.booking.create({
-                data: { roomId, slotTime, userId },
+                data: {
+                    locationId,
+                    userId,
+                    startTime,
+                    endTime
+                }
             });
         });
 
-        revalidatePath("/booking");
-        return { success: true, data: result };
+
+        revalidatePath(`/organization/${organizationId}/location/${locationId}`);
+        return { success: true };
+
     } catch (error: any) {
-        return { success: false, error: error.message };
+        return { error: error.message || "Failed to create booking." };
     }
 }
 
-export async function getBookings() {
-    const date = new Date().toISOString().split('T')[0];
+export async function getLocationBookings(locationId: string, targetDateISO: string) {
+    const targetDate = new Date(targetDateISO);
+    const startOfDay = new Date(targetDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(targetDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
     return await prisma.booking.findMany({
-        where: { slotTime: { startsWith: date } },
-        include: { user: true }
+        where: {
+            locationId,
+            startTime: { gte: startOfDay, lte: endOfDay }
+        },
+        orderBy: { startTime: 'asc' }
     });
 }
 
-export async function cancelBooking(bookingId: string) {
+export async function cancelBooking(bookingId: string, locationId: string, organizationId: string) {
     const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    if (!userId) return { error: "Unauthorized" };
 
     try {
         await prisma.booking.delete({
@@ -73,9 +116,9 @@ export async function cancelBooking(bookingId: string) {
             },
         });
 
-        revalidatePath("/booking");
+        revalidatePath(`/organization/${organizationId}/location/${locationId}`);
         return { success: true };
     } catch (error: any) {
-        return { success: false, error: "Failed to cancel booking." };
+        return { error: "Failed to cancel booking." };
     }
 }

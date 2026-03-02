@@ -64,20 +64,17 @@ model OrgInvite {
   @@unique([email, organizationId]) 
 }
 
-model User {
-  id       String    @id
-  name     String?
-  bookings Booking[]
-}
-
 
 model Booking {
-  id       String @id @default(cuid())
-  slotTime String
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
+  id         String   @id @default(cuid())
+  
+  startTime  DateTime 
+  endTime    DateTime 
+  
+  userId     String   
+  
   locationId String
-  location       Location     @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
-  @@unique([locationId, slotTime])
+  @@unique([locationId, startTime]) 
 }
