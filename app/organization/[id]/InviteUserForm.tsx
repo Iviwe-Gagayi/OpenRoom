@@ -19,7 +19,7 @@ export default function InviteUserForm({ organizationId }: { organizationId: str
         if (result.error) {
             setStatus({ type: "error", message: result.error });
         } else {
-            setStatus({ type: "success", message: "Invite sent successfully!" });
+            setStatus({ type: "success", message: "User whitelisted successfully!" });
             setEmail("");
         }
 
@@ -28,7 +28,7 @@ export default function InviteUserForm({ organizationId }: { organizationId: str
 
     return (
         <div className="p-6 border border-zinc-200 bg-white shadow-sm">
-            <h2 className="text-lg font-bold mb-1">Invite New User</h2>
+            <h2 className="text-lg font-bold mb-1">Add New User</h2>
             <p className="text-sm text-zinc-500 mb-6">
                 Add an email address to the whitelist. They will automatically join this organization when they sign up.
             </p>
@@ -56,7 +56,7 @@ export default function InviteUserForm({ organizationId }: { organizationId: str
                     disabled={isPending || !email}
                     className=" cursor-pointer px-6 py-2 bg-zinc-900 text-white font-medium  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isPending ? "Sending..." : "Send Invite"}
+                    {isPending ? "Whitelisting..." : "User whitelisted!"}
                 </button>
             </form>
         </div>

@@ -51,6 +51,17 @@ export default function MemberList({
                                 {member.email} • Role: <span className="font-semibold">{member.role}</span>
                             </p>
                         </div>
+
+                        {member.userId !== currentUserId && (
+                            <button
+                                onClick={() => handleRemove(member.userId)}
+                                disabled={loadingId === member.userId}
+                                className="cursor-pointer text-sm text-red-600 hover:text-red-800 font-medium disabled:opacity-50 transition-colors px-3 py-1"
+                            >
+                                {loadingId === member.userId ? "Removing..." : "Remove"}
+                            </button>
+                        )}
+
                     </li>
                 ))}
             </ul>
