@@ -6,6 +6,8 @@ import DeleteLocationButton from "./DeleteLocationButton";
 import InviteUserForm from "./InviteUserForm";
 import MemberList from "./MemberList";
 import { auth, clerkClient } from "@clerk/nextjs/server";
+import OrganizationSettingsForm from "./OrganizationSettingsForm";
+
 
 export default async function OrganizationPage({
     params,
@@ -21,8 +23,8 @@ export default async function OrganizationPage({
     const { id: organizationId } = await params;
     const { view } = await searchParams;
 
-    const currentView = view === "users" ? "users" : "locations";
-
+    const validViews = ["locations", "users", "settings"];
+    const currentView = validViews.includes(view as string) ? view : "locations";
 
     const membership = await prisma.orgMember.findUnique({
         where: {
@@ -126,10 +128,19 @@ export default async function OrganizationPage({
                         >
                             Users & Invites
                         </Link>
+                        <Link
+                            href={`/organization/${organizationId}?view=settings`}
+                            className={`pb-3 text-sm font-medium transition-colors border-b-2 ${currentView === "settings"
+                                ? "border-orange-500 text-orange-600"
+                                : "border-transparent text-zinc-500 hover:text-zinc-900 hover:border-zinc-300"
+                                }`}
+                        >
+                            Settings
+                        </Link>
                     </div>
                 )}
 
-                {currentView === "locations" ? (
+                {currentView === "locations" && (
 
                     /* Locations */
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -162,7 +173,7 @@ export default async function OrganizationPage({
                         ))}
                     </div>
 
-                ) : (
+                )} {currentView === "users" && (
 
                     /* Users & Invites */
                     <div className="space-y-8">
@@ -174,6 +185,16 @@ export default async function OrganizationPage({
                         />
                     </div>
 
+                )}
+
+                {currentView === "settings" && (
+                    <div>
+                        <OrganizationSettingsForm
+                            organizationId={organizationId}
+                            initialSlotDuration={membership.organization.slotDurationMinutes}
+                            initialMaxHours={membership.organization.maxHoursPerUser}
+                        />
+                    </div>
                 )}
             </main>
         </div>

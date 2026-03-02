@@ -42,7 +42,7 @@ export default function OrganizationSettingsForm({
     };
 
     return (
-        <div className="p-6 border border-zinc-200 bg-white shadow-sm max-w-xl">
+        <div className="relative z-10 w-full p-8 border border-zinc-200 bg-white shadow-sm">
             <h2 className="text-lg font-bold mb-1">Booking Rules</h2>
             <p className="text-sm text-zinc-500 mb-6">
                 Define the global calendar grid and usage limits for this organization.
@@ -63,6 +63,7 @@ export default function OrganizationSettingsForm({
                     >
                         <option value={15}>15 Minutes</option>
                         <option value={30}>30 Minutes</option>
+                        <option value={45}>45 Minutes</option>
                         <option value={60}>60 Minutes (1 Hour)</option>
                         <option value={120}>120 Minutes (2 Hours)</option>
                     </select>
@@ -103,7 +104,7 @@ export default function OrganizationSettingsForm({
                     <button
                         type="submit"
                         disabled={isPending}
-                        className="px-6 py-2 bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        className="cursor-pointer px-6 py-2 bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors disabled:opacity-50"
                     >
                         {isPending ? "Saving..." : "Save Settings"}
                     </button>
