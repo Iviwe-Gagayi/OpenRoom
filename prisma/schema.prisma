@@ -16,6 +16,9 @@ model Organization {
   members   OrgMember[]
   locations Location[]  // All spaces owned by this org
   invites     OrgInvite[]
+
+  slotDurationMinutes Int          @default(60) 
+  maxHoursPerUser     Int?          @default(2)
 }
 
 //this will connect Clerk account/users to organisations
@@ -41,9 +44,6 @@ model Location {
   
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
-
-  slotDurationMinutes Int          @default(60) // e.g., 15, 30, 60
-  maxHoursPerUser     Int?         //null means unlimited
   
   parentId       String?
   parent         Location?    @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: Cascade)

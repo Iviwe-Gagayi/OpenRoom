@@ -46,6 +46,10 @@ export default function AdminLeafNodeManager({ organisationId, locationId, locat
                 <div className="p-12 border border-zinc-200 bg-white rounded-xl text-center shadow-sm">
                     <h2 className="text-xl font-bold mb-2">Booking Calendar</h2>
                     <p className="text-zinc-500">
+
+
+
+
                         (Calendar UI goes here for {locationName})
                     </p>
                 </div>
