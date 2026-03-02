@@ -86,13 +86,13 @@ export default async function LocationPage({
                     ) : (
                         <div className="mb-24 p-12 border border-zinc-200 bg-white rounded-xl text-center shadow-sm">
                             <h2 className="text-xl font-bold mb-2">Booking Calendar</h2>
-                            <p className="text-zinc-500">
+                            <div className="text-zinc-500">
                                 <BookingInterface
                                     locationId={currentLocation.id}
                                     organizationId={currentLocation.organizationId}
                                     slotDurationMinutes={currentLocation.organization.slotDurationMinutes}
                                 />
-                            </p>
+                            </div>
                         </div>
                     )
                 ) : (
