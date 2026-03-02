@@ -56,7 +56,7 @@ export default function InviteUserForm({ organizationId }: { organizationId: str
                     disabled={isPending || !email}
                     className=" cursor-pointer px-6 py-2 bg-zinc-900 text-white font-medium  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isPending ? "Whitelisting..." : "User whitelisted!"}
+                    {isPending ? "Whitelisting..." : "Add User"}
                 </button>
             </form>
         </div>
