@@ -9,6 +9,8 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import OrganizationSettingsForm from "./OrganizationSettingsForm";
 
 
+
+
 export default async function OrganizationPage({
     params,
     searchParams

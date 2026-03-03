@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { createOrganisation } from "@/app/actions/organisation";
+import AddOrganizationButton from "../organization/[id]/AddOrganizationButton";
 
 export default async function Bookings() {
 
@@ -72,6 +73,7 @@ export default async function Bookings() {
                                 </Link>
                             ))}
                         </div>
+                        <AddOrganizationButton />
                     </div>
                 ) : (
                     //If a User doesn't belong to an organization:
