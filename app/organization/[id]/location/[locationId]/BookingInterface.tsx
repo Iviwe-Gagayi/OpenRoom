@@ -92,7 +92,6 @@ export default function BookingInterface({
         if (result.error) {
             alert(result.error);
         } else {
-            // Apply the exact same Noon Shift here to refresh the UI
             const queryDate = new Date(selectedDate!);
             queryDate.setHours(12, 0, 0, 0);
 
