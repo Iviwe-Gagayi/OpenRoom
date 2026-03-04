@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createOrganisation } from "@/app/actions/organisation";
 import AddOrganizationButton from "../organization/[id]/AddOrganizationButton";
 
-export default async function Bookings() {
+export default async function bookings() {
 
     const { userId } = await auth();
 
@@ -36,7 +36,7 @@ export default async function Bookings() {
                 where: { email: email.toLowerCase() }
             });
 
-            redirect("/Bookings");
+            redirect("/booking");
         }
     }
 

@@ -27,7 +27,7 @@ export async function createOrganisation(formData: FormData) {
             },
         });
 
-        revalidatePath("/bookings");
+        revalidatePath("/booking");
     } catch (error) {
         console.error("Failed to create organization:", error);
         throw new Error("Failed to create organization");

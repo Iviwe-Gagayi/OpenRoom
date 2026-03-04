@@ -38,7 +38,7 @@ export default async function OrganizationPage({
         include: { organization: true }
     });
 
-    if (!membership) redirect("/bookings");
+    if (!membership) redirect("/booking");
     const isAdmin = membership.role === "ADMIN";
 
     // Fetch the Locations with no parent

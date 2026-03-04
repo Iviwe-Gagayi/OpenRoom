@@ -14,7 +14,7 @@ export default async function LocationPage({
     params: Promise<{ id: string, locationId: string }>
 }) {
     const { userId } = await auth();
-    if (!userId) redirect("/sign-in");
+    if (!userId) redirect("/booking");
 
     const { id: organizationId, locationId } = await params;
 
@@ -23,7 +23,7 @@ export default async function LocationPage({
         where: { userId_organizationId: { userId, organizationId } },
     });
 
-    if (!membership) redirect("/bookings");
+    if (!membership) redirect("/booking");
 
 
     const currentLocation = await prisma.location.findFirst({
