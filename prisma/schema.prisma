@@ -18,7 +18,7 @@ model Organization {
   invites     OrgInvite[]
 
   slotDurationMinutes Int          @default(60) 
-  maxHoursPerUser     Int?          @default(2)
+  maxHoursPerUser     Int?          //null means users can book infinitely many rooms per day
 }
 
 //this will connect Clerk account/users to organisations
