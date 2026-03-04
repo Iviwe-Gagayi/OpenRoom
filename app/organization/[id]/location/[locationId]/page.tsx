@@ -99,6 +99,16 @@ export default async function LocationPage({
                 ) : (
                     /* Parent has children */
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {membership.role === "ADMIN" && (
+                            <div className="flex border-2 border-dashed border-zinc-300 hover:border-orange-500 transition-colors min-h-[120px]">
+                                <div className="m-auto">
+                                    <AddLocationButton
+                                        organisationId={organizationId}
+                                        parentId={currentLocation.id}
+                                    />
+                                </div>
+                            </div>
+                        )}
                         {children.map((child) => (
                             <Link
                                 key={child.id}
@@ -118,16 +128,6 @@ export default async function LocationPage({
                             </Link>
                         ))}
 
-                        {membership.role === "ADMIN" && (
-                            <div className="flex border-2 border-dashed border-zinc-300 hover:border-orange-500 transition-colors min-h-[120px]">
-                                <div className="m-auto">
-                                    <AddLocationButton
-                                        organisationId={organizationId}
-                                        parentId={currentLocation.id}
-                                    />
-                                </div>
-                            </div>
-                        )}
                     </div>
                 )}
             </main>
