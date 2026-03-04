@@ -6,6 +6,8 @@ import { setHours, setMinutes, addMinutes, isBefore, format } from "date-fns";
 import { createBooking, getLocationBookings } from "@/app/actions/bookings";
 import { useAuth } from "@clerk/nextjs";
 
+export const dynamic = 'force-dynamic';
+
 export default function BookingInterface({
     locationId,
     organizationId,

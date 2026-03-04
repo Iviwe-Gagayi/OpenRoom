@@ -14,7 +14,7 @@ type AdminLeafNodeProps = {
     currentLocation: LocationWithOrg;
 };
 
-export const dynamic = 'force-dynamic';
+
 
 export default function AdminLeafNodeManager({ currentLocation }: AdminLeafNodeProps) {
     const [viewMode, setViewMode] = useState<"admin" | "user">("admin");
