@@ -6,8 +6,6 @@ import { setHours, setMinutes, addMinutes, isBefore, format } from "date-fns";
 import { createBooking, getLocationBookings } from "@/app/actions/bookings";
 import { useAuth } from "@clerk/nextjs";
 
-export const dynamic = 'force-dynamic';
-
 export default function BookingInterface({
     locationId,
     organizationId,
@@ -30,7 +28,11 @@ export default function BookingInterface({
         const fetchBookings = async () => {
             setLoadingSlots(true);
             try {
-                const bookings = await getLocationBookings(locationId, selectedDate.toISOString());
+                // Shifting midnight to noon to prevent the UTC previous day leak
+                const queryDate = new Date(selectedDate);
+                queryDate.setHours(12, 0, 0, 0);
+
+                const bookings = await getLocationBookings(locationId, queryDate.toISOString());
                 setExistingBookings(bookings);
             } catch (error) {
                 console.error("Failed to fetch bookings");
@@ -90,7 +92,11 @@ export default function BookingInterface({
         if (result.error) {
             alert(result.error);
         } else {
-            const updatedBookings = await getLocationBookings(locationId, selectedDate!.toISOString());
+            // Apply the exact same Noon Shift here to refresh the UI
+            const queryDate = new Date(selectedDate!);
+            queryDate.setHours(12, 0, 0, 0);
+
+            const updatedBookings = await getLocationBookings(locationId, queryDate.toISOString());
             setExistingBookings(updatedBookings);
         }
 
