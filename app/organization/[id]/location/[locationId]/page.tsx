@@ -7,6 +7,8 @@ import DeleteLocationButton from "../../DeleteLocationButton";
 import AdminLeafNodeManager from "./AdminLeafNodeManager";
 import BookingInterface from "./BookingInterface";
 
+export const dynamic = 'force-dynamic';
+
 export default async function LocationPage({
     params
 }: {
