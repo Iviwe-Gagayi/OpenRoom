@@ -30,7 +30,7 @@ model OrgMember {
   createdAt      DateTime     @default(now())
   
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
   @@unique([userId, organizationId]) // A user can only join an org once
 }
@@ -43,7 +43,7 @@ model Location {
   type           String       // e.g. "CAMPUS", "BUILDING", "ROOM"
   
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
   parentId       String?
   parent         Location?    @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: Cascade)

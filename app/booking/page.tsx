@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { createOrganisation } from "@/app/actions/organisation";
 import AddOrganizationButton from "../organization/[id]/AddOrganizationButton";
+import DeleteOrgButton from "../organization/[id]/DeleteOrgButton";
 
 export default async function bookings() {
 
@@ -63,14 +64,26 @@ export default async function bookings() {
                         <h1 className="text-3xl font-bold tracking-tighter">Your Organisations</h1>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {membership.map((membership) => (
-                                <Link
-                                    key={membership.organization.id}
-                                    href={`/organization/${membership.organization.id}`}
-                                    className="block p-6 border border-zinc-200 hover:border-orange-500 transition-colors bg-white shadow-sm"
-                                >
-                                    <h2 className="font-bold text-lg">{membership.organization.name}</h2>
-                                    <p className="text-sm text-zinc-500 mt-2">Role: {membership.role}</p>
-                                </Link>
+                                <div key={membership.organization.id} className="relative group">
+                                    <Link
+                                        href={`/organization/${membership.organization.id}`}
+                                        className="block p-6 border border-zinc-200 hover:border-orange-500 transition-colors bg-white shadow-sm h-full"
+                                    >
+                                        <h2 className="font-bold text-lg pr-8">{membership.organization.name}</h2>
+                                        <p className="text-sm text-zinc-500 mt-2">Role: {membership.role}</p>
+                                    </Link>
+
+                                    {/* Delete Button*/}
+                                    {membership.role === "ADMIN" && (
+                                        <div className="absolute top-4 right-4 z-10">
+                                            <DeleteOrgButton
+                                                organizationId={membership.organization.id}
+                                                organizationName={membership.organization.name}
+                                            />
+                                        </div>
+                                    )}
+
+                                </div>
                             ))}
                         </div>
                         <AddOrganizationButton />

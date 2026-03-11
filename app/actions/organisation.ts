@@ -33,3 +33,37 @@ export async function createOrganisation(formData: FormData) {
         throw new Error("Failed to create organization");
     }
 }
+
+export async function deleteOrganization(organizationId: string) {
+    const { userId } = await auth();
+    if (!userId) return { error: "Unauthorized" };
+
+    try {
+
+        const member = await prisma.orgMember.findUnique({
+            where: {
+                userId_organizationId: {
+                    userId: userId,
+                    organizationId: organizationId,
+                }
+            }
+        });
+
+        if (!member || member.role !== "ADMIN") {
+            return { error: "You do not have permission to delete this organization." };
+        }
+
+
+        await prisma.organization.delete({
+            where: { id: organizationId }
+        });
+
+
+        revalidatePath('/booking');
+
+        return { success: true };
+
+    } catch (error: any) {
+        return { error: error.message || "Failed to delete organization." };
+    }
+}
