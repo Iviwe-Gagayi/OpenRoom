@@ -67,3 +67,51 @@ export async function deleteOrganization(organizationId: string) {
         return { error: error.message || "Failed to delete organization." };
     }
 }
+
+export async function updateUserRole(
+    organizationId: string,
+    targetUserId: string,
+    newRole: "ADMIN" | "USER"
+) {
+    const { userId } = await auth();
+    if (!userId) return { error: "Unauthorized" };
+
+    try {
+
+        const requester = await prisma.orgMember.findUnique({
+            where: {
+                userId_organizationId: {
+                    userId: userId,
+                    organizationId: organizationId,
+                }
+            }
+        });
+
+        if (!requester || requester.role !== "ADMIN") {
+            return { error: "Only admins can change member roles." };
+        }
+
+
+        if (userId === targetUserId && newRole === "USER") {
+            return { error: "You cannot demote yourself. Another admin must do it." };
+        }
+
+
+        await prisma.orgMember.update({
+            where: {
+                userId_organizationId: {
+                    userId: targetUserId,
+                    organizationId: organizationId,
+                }
+            },
+            data: { role: newRole }
+        });
+
+
+        revalidatePath(`/organization/${organizationId}`);
+        return { success: true };
+
+    } catch (error: any) {
+        return { error: error.message || "Failed to update role." };
+    }
+}
